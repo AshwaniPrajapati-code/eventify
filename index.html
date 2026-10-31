@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eventify - Smart Campus Event Portal</title>
+  
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="ai.css" />
+  <link rel="stylesheet" href="captcha.css" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- 1. Security Gateway Screen (I am not a robot) -->
+  <div class="security-gateway" id="securityGateway">
+    <div class="captcha-card">
+      <div class="security-logo">🛡️</div>
+      <h2>Checking your browser...</h2>
+      <p>Eventify requires security verification before granting access to portal.</p>
+
+      <div class="recaptcha-box">
+        <div class="recaptcha-left" onclick="triggerCaptcha()">
+          <div class="captcha-checkbox" id="captchaBox">
+            <span id="captchaCheck"></span>
+          </div>
+          <span class="captcha-label" id="captchaLabel">I am not a robot</span>
+        </div>
+        <div class="recaptcha-brand">
+          <span class="brand-icon">⚡</span>
+          <span>Eventify Guard</span>
+        </div>
+      </div>
+
+      <div class="security-footer">
+        DDoS protection and browser integrity verification by Eventify Core Security.
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Main Navigation Bar -->
+  <header class="navbar">
+    <div class="logo">
+      <span class="logo-icon">⚡</span> Eventify
+    </div>
+    <div class="nav-links">
+      <a href="#events" class="nav-item">Explore Events</a>
+      <a href="javascript:void(0)" class="nav-item" onclick="openHelpModal()">Help & FAQ</a>
+      <button class="btn-outline" onclick="openAdminModal()">Admin Panel</button>
+    </div>
+  </header>
+
+  <!-- 3. Hero Section -->
+  <section class="hero">
+    <div class="glow-bg"></div>
+    <span class="hero-badge">🚀 Campus Tech & Cultural Hub 2026</span>
+    <h1>Discover, Participate & Lead <br><span class="gradient-text">Campus Events</span></h1>
+    <p>Seamlessly browse hackathons, cultural fests, sports, and guest lectures with instant digital pass generation.</p>
+
+    <!-- Quick Stats -->
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-number">12+</span>
+        <span class="stat-label">Live Events</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">1,500+</span>
+        <span class="stat-label">Registrations</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">Verified Passes</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Search & Category Filters -->
+  <section class="controls-section" id="events">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search event by name or venue..." onkeyup="filterEvents()" />
+    </div>
+
+    <div class="category-tabs">
+      <button class="tab active" onclick="setCategory('all', this)">All Events</button>
+      <button class="tab" onclick="setCategory('Technical', this)">Technical</button>
+      <button class="tab" onclick="setCategory('Cultural', this)">Cultural</button>
+      <button class="tab" onclick="setCategory('Sports', this)">Sports</button>
+    </div>
+  </section>
+
+  <!-- 5. Events Showcase Grid -->
+  <main class="events-container">
+    <div class="event-grid" id="eventsGrid">
+      <!-- Dynamic cards rendered by app.js -->
+    </div>
+  </main>
+
+  <!-- 6. Registration Modal -->
+  <div class="modal-overlay" id="registrationModal">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('registrationModal')">&times;</button>
+      <div class="modal-header">
+        <span class="modal-tag">Fast Registration</span>
+        <h3 id="modalEventTitle">Event Registration</h3>
+        <p class="modal-sub">Fill details to get your digital event pass immediately.</p>
+      </div>
+
+      <form id="regForm" onsubmit="handleRegistration(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="userName" required placeholder="e.g. Ashwani Prajapati" />
+        </div>
+        <div class="form-group">
+          <label>Student Email</label>
+          <input type="email" id="userEmail" required placeholder="e.g. student@college.edu" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Roll / Student ID</label>
+            <input type="text" id="userRoll" required placeholder="e.g. 24BC102" />
+          </div>
+          <div class="form-group">
+            <label>Semester / Year</label>
+            <input type="text" id="userSem" required placeholder="e.g. Final Year" />
+          </div>
+        </div>
+        <button type="submit" class="btn-primary full-width">Generate Event Pass</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Digital Ticket Modal -->
+  <div class="modal-overlay" id="ticketModal">
+    <div class="modal-card ticket-card">
+      <button class="close-btn" onclick="closeModal('ticketModal')">&times;</button>
+      <div class="ticket-header">
+        <div class="ticket-badge">VERIFIED ENTRY PASS</div>
+        <h2 id="tktEventTitle">Event Title</h2>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-info">
+          <div><span class="muted">Attendee:</span> <strong id="tktName">-</strong></div>
+          <div><span class="muted">Roll ID:</span> <strong id="tktRoll">-</strong></div>
+          <div><span class="muted">Date:</span> <strong id="tktDate">-</strong></div>
+          <div><span class="muted">Venue:</span> <strong id="tktVenue">-</strong></div>
+        </div>
+        <div class="ticket-qr">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=VERIFIED-EVENTIFY-PASS" alt="QR Code" />
+          <span class="qr-label">Scan at Gate</span>
+        </div>
+      </div>
+      <div class="ticket-footer">
+        <button class="btn-outline full-width" onclick="downloadPass()">Print / Save Pass (PDF)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Admin Modal -->
+  <div class="modal-overlay" id="adminModal">
+    <div class="modal-card admin-card">
+      <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
+      <div class="modal-header">
+        <span class="modal-tag">Organizer Dashboard</span>
+        <h3>Admin Management</h3>
+        <p class="modal-sub">Create new campus events and manage registrations.</p>
+      </div>
+
+      <div class="admin-tabs">
+        <button class="tab active" id="tabAddBtn" onclick="switchAdminTab('add')">+ Add Event</button>
+        <button class="tab" id="tabViewBtn" onclick="switchAdminTab('view')">View Attendees</button>
+      </div>
+
+      <!-- Add Event Form -->
+      <form id="addEventForm" onsubmit="handleCreateEvent(event)" class="admin-section">
+        <div class="form-group">
+          <label>Event Title</label>
+          <input type="text" id="newEventTitle" required placeholder="e.g. Code Clash 2026" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="newEventCategory" class="custom-select">
+              <option value="Technical">Technical</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Sports">Sports</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="text" id="newEventDate" required placeholder="e.g. Dec 05, 2026" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Venue</label>
+          <input type="text" id="newEventVenue" required placeholder="e.g. Auditorium Hall" />
+        </div>
+        <div class="form-group">
+          <label>Banner Image URL (Optional)</label>
+          <input type="url" id="newEventBanner" placeholder="https://..." />
+        </div>
+        <div class="form-group">
+          <label>Short Description</label>
+          <textarea id="newEventDesc" rows="3" required placeholder="Event summary, eligibility, prizes..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary full-width">Publish Event</button>
+      </form>
+
+      <!-- Is code ko Attendees Table se upar lagao -->
+<div style="display: flex; justify-content: flex-end; margin-bottom: 0.8rem;">
+  <button class="btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="exportAttendeesCSV()">📥 Export as CSV (Excel)</button>
+</div>
+      <!-- Attendees Table -->
+      <div id="attendeesSection" class="admin-section" style="display: none;">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Student</th>
+                <th>Roll ID</th>
+              </tr>
+            </thead>
+            <tbody id="attendeesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Help Modal -->
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('helpModal')">&times;</button>
+      <div class="modal-header">
+        <span class="modal-tag">Help & Guidelines</span>
+        <h3>Student Help Desk</h3>
+        <p class="modal-sub">Eventify portal FAQs.</p>
+      </div>
+
+      <div class="help-faq-list">
+        <div class="faq-item">
+          <h4>1. Event pass kaise download karein?</h4>
+          <p>Kisi bhi event ke "Register & Get Pass" button par click karke form bharein, submit karte hi QR Entry Pass generate ho jayega jise aap save ya print kar sakte hain.</p>
+        </div>
+        <div class="faq-item">
+          <h4>2. Kya registration ke koi charges hain?</h4>
+          <p>Nahi, college campus ke sabhi events students ke liye bilkul free hain.</p>
+        </div>
+        <div class="faq-item">
+          <h4>3. Ek student kitne events me register ho sakta hai?</h4>
+          <p>Aap alag-alag sabhi categories (Technical, Cultural, Sports) ke multiple events me hissa le sakte hain.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast">Registration Confirmed! Pass Generated.</div>
+
+  <!-- 10. Floating AI Assistant Button -->
+  <button class="ai-fab" onclick="toggleAIChat()">
+    <span class="ai-sparkle">✨</span> Ask Eventify AI
+  </button>
+
+  <!-- AI Chat Window -->
+  <div class="ai-chat-window" id="aiChatWindow">
+    <div class="ai-header">
+      <div class="ai-title">
+        <span class="ai-status-dot"></span>
+        <span>Eventify Smart AI</span>
+      </div>
+      <button class="close-chat" onclick="toggleAIChat()">&times;</button>
+    </div>
+    
+    <div class="ai-messages" id="aiMessages">
+      <div class="bot-msg">
+        Namaste! Main Eventify Campus AI Assistant hoon. Events, passes ya schedule ke baare me kuch bhi puchhiye!
+      </div>
+    </div>
+
+    <!-- Quick Prompts -->
+    <div class="quick-prompts">
+      <button onclick="sendQuickPrompt('Kaun se events live hain?')">Live Events</button>
+      <button onclick="sendQuickPrompt('Pass kaise milega?')">Pass Info</button>
+      <button onclick="sendQuickPrompt('Technical events kaun se hain?')">Technical Events</button>
+    </div>
+
+    <form class="ai-input-form" onsubmit="handleAIChatSubmit(event)">
+      <input type="text" id="aiInput" placeholder="Ask AI about events, passes..." autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script src="captcha.js"></script>
+  <script src="app.js"></script>
+  <script src="ai.js"></script>
+</body>
+</html>
